@@ -1,0 +1,5 @@
+/home/pkruger/Projects/quarkiverse.io/quarkus-jokes/deployment/src/main/java/io/quarkus/jokes/deployment/JokesBuildItem.java
+/home/pkruger/Projects/quarkiverse.io/quarkus-jokes/deployment/src/main/java/io/quarkus/jokes/deployment/JokesProcessor.java
+/home/pkruger/Projects/quarkiverse.io/quarkus-jokes/deployment/src/main/java/io/quarkus/jokes/deployment/buildtime/WebComponentsJokesProcessor.java
+/home/pkruger/Projects/quarkiverse.io/quarkus-jokes/deployment/src/main/java/io/quarkus/jokes/deployment/User.java
+/home/pkruger/Projects/quarkiverse.io/quarkus-jokes/deployment/src/main/java/io/quarkus/jokes/deployment/Joke.java

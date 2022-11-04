@@ -1,2 +1,1 @@
-# quarkus-jokes
-An example Quarkus extension
+# Example Quarkus Extension to show all options in Dev UI

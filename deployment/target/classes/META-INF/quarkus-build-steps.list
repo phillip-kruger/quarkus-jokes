@@ -1,0 +1,2 @@
+io.quarkus.jokes.deployment.JokesProcessor
+io.quarkus.jokes.deployment.buildtime.WebComponentsJokesProcessor

@@ -1,0 +1,11 @@
+---
+name: "Jokes"
+metadata:
+  short-name: "jokes"
+  keywords:
+  - "jokes"
+  - "example"    
+  - "dev-ui"
+  categories:
+  - "core"
+  status: "stable"
