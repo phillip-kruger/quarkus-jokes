@@ -18,7 +18,7 @@ public class DevUIJokesProcessor {
         // Add build time data
         pageBuildItem.addBuildTimeData("jokes", jokesBuildItem.getJokes());
 
-        // Page(s) that links to external resource.
+        // 1) Page(s) that links to external resource.
         pageBuildItem.addPage(Page.externalPageBuilder("External HTML")
                 .icon("font-awesome-solid:arrow-up-right-from-square")
                 .label("external")
@@ -33,7 +33,14 @@ public class DevUIJokesProcessor {
                 .isJsonContent()
                 .build());
 
-        // Page that show build time data in a table
+        // 2) Page that show build time data in raw json format
+        pageBuildItem.addPage(Page.rawDataPageBuilder("Raw data")
+                .icon("font-awesome-brands:js")
+                .label("data")
+                .buildTimeDataKey("jokes")
+                .build());
+
+        // 3) Page that show build time data in a table
         pageBuildItem.addPage(Page.tableDataPageBuilder("Table data")
                 .icon("font-awesome-solid:table")
                 .label("data")
