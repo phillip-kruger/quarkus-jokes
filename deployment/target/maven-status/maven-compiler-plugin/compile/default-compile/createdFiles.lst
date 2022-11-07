@@ -4,8 +4,8 @@ io/quarkus/jokes/deployment/JokesProcessor$$accessor.class
 io/quarkus/jokes/deployment/Joke.class
 io/quarkus/jokes/deployment/User$Picture.class
 io/quarkus/jokes/deployment/User.class
-io/quarkus/jokes/deployment/buildtime/WebComponentsJokesProcessor.class
 META-INF/quarkus-javadoc.properties
 io/quarkus/jokes/deployment/JokesProcessor.class
 io/quarkus/jokes/deployment/JokesBuildItem.class
+io/quarkus/jokes/deployment/devui/DevUIJokesProcessor.class
 META-INF/quarkus-build-steps.list

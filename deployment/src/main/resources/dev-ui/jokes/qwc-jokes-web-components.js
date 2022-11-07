@@ -1,7 +1,5 @@
 import { LitElement, html, css} from 'lit';
 import { jokes } from 'jokes-data';
-import { columnBodyRenderer } from '@vaadin/grid/lit.js';
-import '@vaadin/grid';
 import '@vaadin/message-list';
 
 /**

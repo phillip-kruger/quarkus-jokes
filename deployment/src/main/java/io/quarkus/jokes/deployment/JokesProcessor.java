@@ -14,7 +14,7 @@ import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.deployment.builditem.FeatureBuildItem;
 
 class JokesProcessor {
-    private static final String FEATURE = "dev-ui-example";
+    private static final String FEATURE = "jokes";
     private final ObjectMapper mapper = new ObjectMapper();
 
     @BuildStep
