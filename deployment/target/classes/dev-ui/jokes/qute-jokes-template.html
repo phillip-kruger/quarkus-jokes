@@ -1,0 +1,46 @@
+<style type="text/css">
+    table  {
+        border-spacing:0;
+        width: 99%;
+    }
+    table th{
+        overflow:hidden;
+        padding:10px 5px;
+        word-break:normal;
+        text-align:left;
+        vertical-align:top
+    }
+    table td{
+        border-bottom-width:1px;
+        overflow:hidden;
+        padding:10px 5px;
+        word-break:normal;
+        text-align:left;
+        vertical-align:top
+    }
+    span {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+</style>
+
+<table>
+    <thead>
+        <tr>
+            <th>Timestamp</th>
+            <th>User</th>
+            <th>Joke</th>
+        </tr>
+    </thead>
+    <tbody>
+        {#for joke in jokes} 
+        <tr>
+            <td>{joke.timestamp}</td>
+            <td><span><img src="{joke.profilePic}" height="30px"></img> {joke.user}</span></td>
+            <td>{joke.fullJoke}</td>
+        </tr>
+        {/for}
+    </tbody>
+</table>
