@@ -3,6 +3,7 @@ package io.quarkus.jokes.deployment;
 import java.util.List;
 
 import io.quarkus.builder.item.SimpleBuildItem;
+import io.quarkus.jokes.runtime.Joke;
 
 /**
  * Just some random jokes

@@ -1,4 +1,4 @@
-package io.quarkus.jokes.deployment;
+package io.quarkus.jokes.runtime;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

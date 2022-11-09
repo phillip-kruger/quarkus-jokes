@@ -1,10 +1,6 @@
-io/quarkus/jokes/deployment/devui/JokesDevUIProcessor.class
-io/quarkus/jokes/deployment/Joke.class
 io/quarkus/jokes/deployment/JokesProcessor$Results.class
-io/quarkus/jokes/deployment/User$Name.class
+io/quarkus/jokes/deployment/devui/JokesDevUIProcessor.class
 io/quarkus/jokes/deployment/JokesProcessor$$accessor.class
-io/quarkus/jokes/deployment/User$Picture.class
-io/quarkus/jokes/deployment/User.class
 META-INF/quarkus-javadoc.properties
 io/quarkus/jokes/deployment/JokesProcessor.class
 io/quarkus/jokes/deployment/JokesBuildItem.class

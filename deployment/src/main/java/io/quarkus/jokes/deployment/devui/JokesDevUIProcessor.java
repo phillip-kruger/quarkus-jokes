@@ -1,16 +1,19 @@
 package io.quarkus.jokes.deployment.devui;
 
+import io.quarkus.deployment.IsDevelopment;
 import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.devui.deployment.spi.page.Page;
 import io.quarkus.devui.deployment.spi.page.PageBuildItem;
+import io.quarkus.devui.deployment.spi.runtime.JsonRPCProvidersBuildItem;
 import io.quarkus.jokes.deployment.JokesBuildItem;
+import io.quarkus.jokes.runtime.JokesJsonRPCService;
 
 /**
  * This example show how to show some pages in Dev UI
  */
 public class JokesDevUIProcessor {
 
-    @BuildStep
+    @BuildStep(onlyIf = IsDevelopment.class)
     PageBuildItem createJokes(JokesBuildItem jokesBuildItem) {
 
         PageBuildItem pageBuildItem = new PageBuildItem("Jokes");
@@ -61,4 +64,8 @@ public class JokesDevUIProcessor {
         return pageBuildItem;
     }
 
+    @BuildStep(onlyIf = IsDevelopment.class)
+    JsonRPCProvidersBuildItem createJsonRPCService() {
+        return new JsonRPCProvidersBuildItem("Jokes", JokesJsonRPCService.class);
+    }
 }

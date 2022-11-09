@@ -12,6 +12,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.deployment.builditem.FeatureBuildItem;
+import io.quarkus.jokes.runtime.Joke;
+import io.quarkus.jokes.runtime.User;
 
 class JokesProcessor {
     private static final String FEATURE = "jokes";
