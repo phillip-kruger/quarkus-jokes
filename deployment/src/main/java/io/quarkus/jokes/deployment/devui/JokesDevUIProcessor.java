@@ -1,7 +1,5 @@
 package io.quarkus.jokes.deployment.devui;
 
-import java.util.Map;
-
 import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.devui.deployment.spi.page.Page;
 import io.quarkus.devui.deployment.spi.page.PageBuildItem;
@@ -37,26 +35,24 @@ public class JokesDevUIProcessor {
         pageBuildItem.addPage(Page.rawDataPageBuilder("Raw data")
                 .icon("font-awesome-brands:js")
                 .label("build-time")
-                .buildTimeDataKey("jokes"));
+                .buildTimeDataKey("jokes")); // TODO: Auto select the first one
 
-        // 3) Page that show build time data in a table
+        // 3) Page that show build time data in a table TODO: Add basic format options ?
         pageBuildItem.addPage(Page.tableDataPageBuilder("Table data")
                 .icon("font-awesome-solid:table")
                 .label("build-time")
                 .showColumn("timestamp")
                 .showColumn("user")
                 .showColumn("fullJoke")
-                .buildTimeDataKey("jokes"));
+                .buildTimeDataKey("jokes")); // TODO: Auto select the first one
 
         // 4) Page that show build time data that has been formatted using Qute
-
         pageBuildItem.addPage(Page.quteDataPageBuilder("Qute data")
                 .icon("font-awesome-solid:q")
                 .label("build-time")
-                .data(Map.of("jokes", jokesBuildItem.getJokes()))
                 .templateLink("qute-jokes-template.html"));
 
-        // Page create with custom web component
+        // 5) Page create with custom web component
         pageBuildItem.addPage(Page.webComponentPageBuilder()
                 .icon("font-awesome-solid:cubes")
                 .componentLink("qwc-jokes-web-components.js")
