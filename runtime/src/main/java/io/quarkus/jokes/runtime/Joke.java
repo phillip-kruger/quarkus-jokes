@@ -97,7 +97,8 @@ public class Joke {
 
     @Override
     public String toString() {
-        return setup + "\n" + punchline;
+        return "Joke{" + "id=" + id + ", type=" + type + ", setup=" + setup + ", punchline=" + punchline + ", timestamp="
+                + timestamp + ", user=" + user + ", profilePic=" + profilePic + "}";
     }
 
 }
