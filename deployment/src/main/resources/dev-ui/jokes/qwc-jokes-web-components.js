@@ -12,11 +12,10 @@ import '@vaadin/progress-bar';
 /**
  * This component shows jokes using web components and build time data
  * 
- * TODO: Params (add your own joke)
  * TODO: Server push (Subscripe to new jokes)
  */
 export class QwcJokesWebComponents extends LitElement {
-    jsonRpcController = new JsonRpcController(this, "Jokes");
+    jsonRPC = new JsonRpcController(this, "Jokes");
     static JOKES = [];
     
     static styles = css`
@@ -197,15 +196,13 @@ export class QwcJokesWebComponents extends LitElement {
 
     _tellMore(){
         this._loadingCount++;
-        this.jsonRpcController.request("getJoke");
+        this.jsonRPC.getJoke();
     }
     
     _addOwnJoke(){
         this._busyAdding = true;
         this._newJokeButtonDisabled = true;
-        console.log("newJoke " + JSON.stringify(this._newJoke));
-        this.jsonRpcController.request("addJoke", this._newJoke);
-        
+        this.jsonRPC.addJoke(this._newJoke);
     }
 
     _contributeJoke(){
@@ -245,8 +242,6 @@ export class QwcJokesWebComponents extends LitElement {
     }
 
     addJokeResponse(result, id){
-        console.log("Add Joke response " + id + " = " + JSON.stringify(result));
-
         var item = this._toJokeItem(result);
         this._jokes = [
             ...this._jokes,

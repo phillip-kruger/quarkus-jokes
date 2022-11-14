@@ -59,7 +59,7 @@ public class JokesDevUIProcessor {
         pageBuildItem.addPage(Page.webComponentPageBuilder()
                 .icon("font-awesome-solid:cubes")
                 .componentLink("qwc-jokes-web-components.js")
-                .label("build-time"));
+                .label("build-and run-time"));
 
         return pageBuildItem;
     }
