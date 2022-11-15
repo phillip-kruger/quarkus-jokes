@@ -242,8 +242,6 @@ export class QwcJokesWebComponents extends LitElement {
     }
 
     addJokeResponse(result, id){
-        console.log("Add Joke response " + id + " = " + JSON.stringify(result));
-
         var item = this._toJokeItem(result);
         this._jokes = [
             ...this._jokes,

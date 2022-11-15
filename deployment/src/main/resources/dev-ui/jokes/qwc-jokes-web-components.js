@@ -196,7 +196,7 @@ export class QwcJokesWebComponents extends LitElement {
 
     _tellMore(){
         this._loadingCount++;
-        this.jsonRPC.getJoke();
+        this.jsonRPC.getJoke(); // TODO: then();
     }
     
     _addOwnJoke(){
