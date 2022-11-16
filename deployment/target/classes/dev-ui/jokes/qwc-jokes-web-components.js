@@ -1,5 +1,5 @@
 import { LitElement, html, css} from 'lit';
-import { JsonRpcController } from 'jsonrpc-controller';
+import { JsonRpc } from 'jsonrpc';
 import { jokes } from 'jokes-data';
 import '@vaadin/message-list';
 import '@vaadin/icon';
@@ -15,7 +15,7 @@ import '@vaadin/progress-bar';
  * TODO: Server push (Subscripe to new jokes)
  */
 export class QwcJokesWebComponents extends LitElement {
-    jsonRPC = new JsonRpcController(this, "Jokes");
+    jsonRpc = new JsonRpc("Jokes");
     static JOKES = [];
     
     static styles = css`
@@ -196,13 +196,28 @@ export class QwcJokesWebComponents extends LitElement {
 
     _tellMore(){
         this._loadingCount++;
-        this.jsonRPC.getJoke(); // TODO: then();
+        this.jsonRpc.getJoke().then(joke => {
+            this._loadingCount--;
+            var item = this._toJokeItem(joke.result);
+            this._jokes = [
+                ...this._jokes,
+                item,
+            ];
+        });
     }
     
     _addOwnJoke(){
         this._busyAdding = true;
         this._newJokeButtonDisabled = true;
-        this.jsonRPC.addJoke(this._newJoke);
+        this.jsonRpc.addJoke(this._newJoke).then(joke => {
+            var item = this._toJokeItem(joke.result);
+            this._jokes = [
+                ...this._jokes,
+                item,
+            ];
+            this._newJokeButtonDisabled = false;
+            this._clearAddJokeForm();
+        });
     }
 
     _contributeJoke(){
@@ -230,25 +245,6 @@ export class QwcJokesWebComponents extends LitElement {
             this._newJokeButtonDisabled = true;
         }
         
-    }
-
-    getJokeResponse(result){
-        this._loadingCount--;
-        var item = this._toJokeItem(result);
-        this._jokes = [
-            ...this._jokes,
-            item,
-        ];
-    }
-
-    addJokeResponse(result, id){
-        var item = this._toJokeItem(result);
-        this._jokes = [
-            ...this._jokes,
-            item,
-        ];
-        this._newJokeButtonDisabled = false;
-        this._clearAddJokeForm();
     }
 
     _cancelAddOwnJoke(){
