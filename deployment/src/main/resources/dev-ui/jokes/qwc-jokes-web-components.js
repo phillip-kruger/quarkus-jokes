@@ -8,6 +8,20 @@ import '@vaadin/text-field';
 import '@vaadin/text-area';
 import '@vaadin/form-layout';
 import '@vaadin/progress-bar';
+import '@vaadin/checkbox';
+
+class JokeScreen {
+    static List = new JokeScreen("list");
+    static Add = new JokeScreen("add");
+    
+    constructor(screen) {
+      this.screen = screen;
+    }
+
+    toString(){
+        return this.screen;
+    }
+}
 
 /**
  * This component shows jokes using web components and build time data
@@ -30,9 +44,19 @@ export class QwcJokesWebComponents extends LitElement {
             justify-content: center;
             gap: 100px;
         }
-        .tellMoreButton {
-            width:90%;
+        
+        .buttonBar {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: center;
+            width: 90%;
         }
+        
+        .buttonBar .button {
+            width: 100%;
+        }
+        
         vaadin-message-list{
             width:90%;
         }
@@ -60,17 +84,20 @@ export class QwcJokesWebComponents extends LitElement {
     
     static properties = {
         _jokes: {state:true},
-        _showAddScreen: {state:true},
+        _observer: {state:false},
+        _currentScreen: {state:true},
         _loadingCount:{state:true},
         _busyAdding: {state:true},
         _newJoke:{state: true},
         _newJokeButtonDisabled:{state: true},
+        _streamJokesContinuously:{state: true},
     };
     
     constructor() {
         super();
         this._loadingCount = 0;
         this._clearAddJokeForm();
+        this._streamJokesContinuously = false;
         
         if(QwcJokesWebComponents.JOKES.length > 0) {
             // Restore the known jokes
@@ -96,15 +123,22 @@ export class QwcJokesWebComponents extends LitElement {
     }
     
     disconnectedCallback() {
-        super.disconnectedCallback();
+        
+        // Make sure we cancel all subscriptions when we leave
+        if(this._streamJokesContinuously){
+            this._observer.cancel();
+        }
+        // Remember all jokes
         QwcJokesWebComponents.JOKES = this._jokes;
+            
+        super.disconnectedCallback();
     }
     
     render() {
-        if(this._jokes && !this._showAddScreen){
-            return this._renderJokesList();
-        }else{
+        if(this._currentScreen === JokeScreen.Add){
             return this._renderAddForm();
+        } else if(this._jokes){
+            return this._renderJokesList();
         }
     }
     
@@ -114,11 +148,17 @@ export class QwcJokesWebComponents extends LitElement {
 
             ${this._renderJokeListProgessBar()}
 
-            <vaadin-button theme="primary success" @click=${this._tellMore} class="tellMoreButton">
-                <vaadin-icon icon="font-awesome-solid:plus"></vaadin-icon> Tell 1 more joke
-            </vaadin-button>    
-            
-            <span @click="${this._contributeJoke}">Do you know any good jokes ? Please tell us ! </span>
+            <div class="buttonBar">
+                <vaadin-button class="button" theme="primary success" @click=${this._tellMore}>
+                    <vaadin-icon icon="font-awesome-solid:comment"></vaadin-icon> Tell 1 more joke
+                </vaadin-button>    
+                <vaadin-button class="button" theme="primary" @click=${this._contributeJoke}>
+                    <vaadin-icon icon="font-awesome-solid:plus"></vaadin-icon> Add a joke
+                </vaadin-button>
+                <vaadin-checkbox id="streamCheckbox" class="button" label="Stream new jokes continuously" @input=${this._toggleStream}></vaadin-checkbox>
+                
+            </div>    
+
         </div>`;
     }
 
@@ -161,22 +201,21 @@ export class QwcJokesWebComponents extends LitElement {
                             error-message="Please enter the joke's punchline."
                             clear-button-visible
                             ></vaadin-text-area>
-
+                        
                         <vaadin-button theme="primary success" ?disabled=${this._newJokeButtonDisabled} @click=${this._addOwnJoke}>
                             <vaadin-icon icon="font-awesome-regular:face-laugh-squint"></vaadin-icon> Make us laugh !
                         </vaadin-button>    
                         <vaadin-button theme="secondary" @click=${this._cancelAddOwnJoke}>
                             <vaadin-icon icon="font-awesome-regular:face-frown"></vaadin-icon> Cancel
                         </vaadin-button>    
-
+                        
                         ${this._renderNewJokeProgessBar()}
 
                     </vaadin-form-layout>
                 </div>
         `;
     }
-
-
+    
     _renderNewJokeProgessBar(){
         if(this._busyAdding){
             return html`
@@ -196,32 +235,45 @@ export class QwcJokesWebComponents extends LitElement {
 
     _tellMore(){
         this._loadingCount++;
-        this.jsonRpc.getJoke().then(joke => {
+        this.jsonRpc.getJoke().then(jsonRpcResponse => {
             this._loadingCount--;
-            var item = this._toJokeItem(joke.result);
-            this._jokes = [
-                ...this._jokes,
-                item,
-            ];
+            this._addToJokes(jsonRpcResponse.result);
         });
     }
     
     _addOwnJoke(){
         this._busyAdding = true;
         this._newJokeButtonDisabled = true;
-        this.jsonRpc.addJoke(this._newJoke).then(joke => {
-            var item = this._toJokeItem(joke.result);
-            this._jokes = [
-                ...this._jokes,
-                item,
-            ];
+        this.jsonRpc.addJoke(this._newJoke).then(jsonRpcResponse => {
+            this._addToJokes(jsonRpcResponse.result);
             this._newJokeButtonDisabled = false;
             this._clearAddJokeForm();
         });
     }
 
+    _toggleStream(e){
+        
+        this._streamJokesContinuously = e.target.checked;
+        
+        if(this._streamJokesContinuously){
+            this._observer = this.jsonRpc.streamJokes().onNext(jsonRpcResponse => {
+                this._addToJokes(jsonRpcResponse.result);
+            });
+        }else {
+            this._observer.cancel();
+        }
+    }
+
+    _addToJokes(joke){
+        var item = this._toJokeItem(joke);
+        this._jokes = [
+            ...this._jokes,
+            item,
+        ];
+    }
+    
     _contributeJoke(){
-        this._showAddScreen = true;
+        this._currentScreen = JokeScreen.Add;
     }
     
     _clearAddJokeForm(){
@@ -230,7 +282,7 @@ export class QwcJokesWebComponents extends LitElement {
             setup: '',
             punchline: '',
         };
-        this._showAddScreen = false;
+        this._currentScreen = JokeScreen.List;
         this._newJokeButtonDisabled = true;
         this._busyAdding = false;
     }
@@ -244,7 +296,6 @@ export class QwcJokesWebComponents extends LitElement {
         }else{
             this._newJokeButtonDisabled = true;
         }
-        
     }
 
     _cancelAddOwnJoke(){

@@ -6,15 +6,28 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Random;
 
+import org.jboss.logging.Logger;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.quarkus.scheduler.Scheduled;
+import io.smallrye.mutiny.Multi;
+import io.smallrye.mutiny.operators.multi.processors.BroadcastProcessor;
+
 /**
- * Provide Jokes
+ * Provide Jokes for JSON-RPC Endpoint
  */
 public class JokesJsonRPCService {
+    private static final Logger LOG = Logger.getLogger(JokesJsonRPCService.class);
     private final ObjectMapper mapper = new ObjectMapper();
     private final Random random = new Random();
+    private final BroadcastProcessor<Joke> jokeStream = BroadcastProcessor.create();
+
+    @Scheduled(every = "10s")
+    void freshJoke() {
+        jokeStream.onNext(getJoke());
+    }
 
     public Joke getJoke() {
         Joke joke = getRandomJoke();
@@ -27,7 +40,6 @@ public class JokesJsonRPCService {
         joke.setTimestamp(getTimestamp());
 
         return joke;
-
     }
 
     public Joke addJoke(String user, String setup, String punchline) {
@@ -41,6 +53,10 @@ public class JokesJsonRPCService {
         return joke;
     }
 
+    public Multi<Joke> streamJokes() {
+        return jokeStream;
+    }
+
     private String getTimestamp() {
         LocalDateTime now = LocalDateTime.now();
         String timestamp = now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME).replace("T", " ");
@@ -51,7 +67,8 @@ public class JokesJsonRPCService {
         try {
             return mapper.readValue(new URL("https://official-joke-api.appspot.com/jokes/random/"), Joke.class);
         } catch (IOException ex) {
-            throw new RuntimeException(ex);
+            // joke service not availalbe. Fallback to hardcoded
+            return backupJoke;
         }
     }
 
@@ -59,12 +76,28 @@ public class JokesJsonRPCService {
         try {
             return mapper.readValue(new URL("https://randomuser.me/api"), Results.class).results[0];
         } catch (IOException ex) {
-            throw new RuntimeException(ex);
+            // user service not availalbe. Fallback to hardcoded
+            return backupUser;
         }
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     static class Results {
         public User[] results;
+    }
+
+    private static User backupUser = new User();
+    private static Joke backupJoke = new Joke();
+    static {
+        backupUser.name = new User.Name();
+        backupUser.name.first = "Phillip";
+        backupUser.name.last = "Kruger";
+        backupUser.name.title = "Mr.";
+        backupUser.picture = new User.Picture();
+        backupUser.picture.thumbnail = "https://avatars.githubusercontent.com/u/6836179?v=4";
+
+        backupJoke.setId(0);
+        backupJoke.setSetup("I'm afraid for the calendar.");
+        backupJoke.setPunchline("Its days are numbered.");
     }
 }
