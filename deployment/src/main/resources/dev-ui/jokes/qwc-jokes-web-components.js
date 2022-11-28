@@ -34,10 +34,9 @@ export class QwcJokesWebComponents extends LitElement {
     
     static styles = css`
         .jokelist {
-            padding-bottom: 100px;
+            padding-bottom: 10px;
             display: flex;
             flex-direction: column;
-            align-items: center;
         }
         .newjokeform {
             display: flex;
