@@ -44,7 +44,7 @@ export class QwcJokesWebComponents extends LitElement {
             gap: 100px;
         }
         
-        .buttonBar {
+        #buttonBar {
             display: flex;
             justify-content: space-between;
             gap: 10px;
@@ -52,7 +52,7 @@ export class QwcJokesWebComponents extends LitElement {
             width: 90%;
         }
         
-        .buttonBar .button {
+        #buttonBar .button {
             width: 100%;
         }
         
@@ -89,7 +89,7 @@ export class QwcJokesWebComponents extends LitElement {
         _busyAdding: {state:true},
         _newJoke:{state: true},
         _newJokeButtonDisabled:{state: true},
-        _streamJokesContinuously:{state: true},
+        _streamJokesContinuously:{state: true}
     };
     
     constructor() {
@@ -117,7 +117,7 @@ export class QwcJokesWebComponents extends LitElement {
             text: joke.fullJoke,
             time: joke.timestamp,
             userName: joke.user,
-            userImg: joke.profilePic,
+            userImg: joke.profilePic
         };
     }
     
@@ -147,7 +147,7 @@ export class QwcJokesWebComponents extends LitElement {
 
             ${this._renderJokeListProgessBar()}
 
-            <div class="buttonBar">
+            <div id="buttonBar">
                 <vaadin-button class="button" theme="primary success" @click=${this._tellMore}>
                     <vaadin-icon icon="font-awesome-solid:comment"></vaadin-icon> Tell 1 more joke
                 </vaadin-button>    
@@ -229,7 +229,7 @@ export class QwcJokesWebComponents extends LitElement {
         // Use one column by default
         { minWidth: 0, columns: 1 },
         // Use two columns, if layout's width exceeds 500px
-        { minWidth: '500px', columns: 2 },
+        { minWidth: '500px', columns: 2 }
     ];
 
     _tellMore(){
@@ -238,6 +238,7 @@ export class QwcJokesWebComponents extends LitElement {
             this._loadingCount--;
             this._addToJokes(jsonRpcResponse.result);
         });
+        this._scrollToBottom();
     }
     
     _addOwnJoke(){
@@ -267,8 +268,18 @@ export class QwcJokesWebComponents extends LitElement {
         var item = this._toJokeItem(joke);
         this._jokes = [
             ...this._jokes,
-            item,
+            item
         ];
+        this._scrollToBottom();
+    }
+    
+    async _scrollToBottom(){
+        await this.updateComplete;
+        const buttonBar = this.shadowRoot.getElementById("buttonBar");
+        buttonBar.scrollIntoView({
+             behavior: "smooth",
+             block: "end"
+        });
     }
     
     _contributeJoke(){
@@ -279,7 +290,7 @@ export class QwcJokesWebComponents extends LitElement {
         this._newJoke = { 
             user: '',
             setup: '',
-            punchline: '',
+            punchline: ''
         };
         this._currentScreen = JokeScreen.List;
         this._newJokeButtonDisabled = true;
