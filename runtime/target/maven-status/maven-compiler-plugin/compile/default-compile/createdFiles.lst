@@ -1,8 +1,0 @@
-io/quarkus/jokes/runtime/User.class
-io/quarkus/jokes/runtime/JokesRecorder.class
-io/quarkus/jokes/runtime/JokesJsonRPCService$Results.class
-io/quarkus/jokes/runtime/Joke.class
-io/quarkus/jokes/runtime/JokesJsonRPCService.class
-META-INF/quarkus-javadoc.properties
-io/quarkus/jokes/runtime/User$Picture.class
-io/quarkus/jokes/runtime/User$Name.class

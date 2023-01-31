@@ -1,7 +1,0 @@
-io/quarkus/jokes/deployment/JokesProcessor$Results.class
-io/quarkus/jokes/deployment/devui/JokesDevUIProcessor.class
-io/quarkus/jokes/deployment/JokesProcessor$$accessor.class
-META-INF/quarkus-javadoc.properties
-io/quarkus/jokes/deployment/JokesProcessor.class
-io/quarkus/jokes/deployment/JokesBuildItem.class
-META-INF/quarkus-build-steps.list

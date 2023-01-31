@@ -2,9 +2,9 @@ package io.quarkus.jokes.deployment.devui;
 
 import io.quarkus.deployment.IsDevelopment;
 import io.quarkus.deployment.annotations.BuildStep;
-import io.quarkus.devui.deployment.spi.page.Page;
-import io.quarkus.devui.deployment.spi.page.PageBuildItem;
-import io.quarkus.devui.deployment.spi.runtime.JsonRPCProvidersBuildItem;
+import io.quarkus.devui.spi.JsonRPCProvidersBuildItem;
+import io.quarkus.devui.spi.page.Page;
+import io.quarkus.devui.spi.page.PageBuildItem;
 import io.quarkus.jokes.deployment.JokesBuildItem;
 import io.quarkus.jokes.runtime.JokesJsonRPCService;
 
