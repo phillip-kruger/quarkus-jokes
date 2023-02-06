@@ -25,8 +25,6 @@ class JokeScreen {
 
 /**
  * This component shows jokes using web components and build time data
- * 
- * TODO: Server push (Subscripe to new jokes)
  */
 export class QwcJokesWebComponents extends LitElement {
     jsonRpc = new JsonRpc("Jokes");
