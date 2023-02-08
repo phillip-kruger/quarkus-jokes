@@ -5,6 +5,7 @@ import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.devui.spi.JsonRPCProvidersBuildItem;
 import io.quarkus.devui.spi.page.CardPageBuildItem;
+import io.quarkus.devui.spi.page.FooterPageBuildItem;
 import io.quarkus.devui.spi.page.MenuPageBuildItem;
 import io.quarkus.devui.spi.page.Page;
 import io.quarkus.devui.spi.page.WebComponentPageBuilder;
@@ -19,6 +20,7 @@ public class JokesDevUIProcessor {
     @BuildStep(onlyIf = IsDevelopment.class)
     void createJokes(BuildProducer<CardPageBuildItem> cardsProducer,
             BuildProducer<MenuPageBuildItem> menuProducer,
+            BuildProducer<FooterPageBuildItem> footerProducer,
             JokesBuildItem jokesBuildItem) {
 
         CardPageBuildItem cardPageBuildItem = new CardPageBuildItem("Jokes");
@@ -68,13 +70,23 @@ public class JokesDevUIProcessor {
         cardPageBuildItem.addPage(webComponentPage);
         cardsProducer.produce(cardPageBuildItem);
 
-        // 6) Also add a link in the main menu section ?
+        // 6) Also add a link in the main menu section
         WebComponentPageBuilder menuItemPageBuilder = Page.webComponentPageBuilder()
                 .icon("font-awesome-regular:face-grin-tongue-wink")
+                .title("Joke")
                 .componentLink("qwc-jokes-menu.js");
 
-        MenuPageBuildItem menuPageBuildItem = new MenuPageBuildItem("Jokes", menuItemPageBuilder, webComponentPage);
+        MenuPageBuildItem menuPageBuildItem = new MenuPageBuildItem("Jokes", menuItemPageBuilder);
         menuProducer.produce(menuPageBuildItem);
+
+        // 7) Also add a tab in the footer
+        WebComponentPageBuilder jokeLogPageBuilder = Page.webComponentPageBuilder()
+                .icon("font-awesome-regular:face-grin-tongue-wink")
+                .title("Joke Log")
+                .componentLink("qwc-jokes-log.js");
+
+        FooterPageBuildItem footerPageBuildItem = new FooterPageBuildItem("Jokes", jokeLogPageBuilder);
+        footerProducer.produce(footerPageBuildItem);
 
     }
 

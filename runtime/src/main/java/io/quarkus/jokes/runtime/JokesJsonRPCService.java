@@ -24,6 +24,8 @@ public class JokesJsonRPCService {
     private final Random random = new Random();
     private final BroadcastProcessor<Joke> jokeStream = BroadcastProcessor.create();
 
+    private final BroadcastProcessor<Joke> jokeLog = BroadcastProcessor.create();
+
     @Scheduled(every = "10s")
     void freshJoke() {
         jokeStream.onNext(getJoke());
@@ -38,6 +40,8 @@ public class JokesJsonRPCService {
         joke.setProfilePic(user.getProfileIcon());
 
         joke.setTimestamp(getTimestamp());
+
+        jokeLog.onNext(joke);
 
         return joke;
     }
@@ -55,6 +59,10 @@ public class JokesJsonRPCService {
 
     public Multi<Joke> streamJokes() {
         return jokeStream;
+    }
+
+    public Multi<Joke> jokeLog() {
+        return jokeLog;
     }
 
     private String getTimestamp() {
