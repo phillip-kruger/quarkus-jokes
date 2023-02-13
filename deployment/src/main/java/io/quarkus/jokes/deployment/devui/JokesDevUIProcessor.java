@@ -25,32 +25,35 @@ public class JokesDevUIProcessor {
 
         CardPageBuildItem cardPageBuildItem = new CardPageBuildItem("Jokes");
 
+        // Set custom card
+        cardPageBuildItem.setCustomCard("qwc-jokes-card.js");
+
         // Add build time data
         cardPageBuildItem.addBuildTimeData("jokes", jokesBuildItem.getJokes());
 
         // 1) Page(s) that links to external resource.
         cardPageBuildItem.addPage(Page.externalPageBuilder("External HTML")
                 .icon("font-awesome-solid:arrow-up-right-from-square")
-                .label("external")
+                .staticLabel("external")
                 .url("https://randomuser.me/")
                 .isHtmlContent());
 
         cardPageBuildItem.addPage(Page.externalPageBuilder("External Json")
                 .icon("font-awesome-solid:arrow-up-right-from-square")
-                .label("external")
+                .staticLabel("external")
                 .url("https://official-joke-api.appspot.com/jokes/ten")
                 .isJsonContent());
 
         // 2) Page that show build time data in raw json format
         cardPageBuildItem.addPage(Page.rawDataPageBuilder("Raw data")
                 .icon("font-awesome-brands:js")
-                .label("build-time")
+                .staticLabel("build-time")
                 .buildTimeDataKey("jokes")); // TODO: Auto select the first one
 
         // 3) Page that show build time data in a table TODO: Add basic format options ?
         cardPageBuildItem.addPage(Page.tableDataPageBuilder("Table data")
                 .icon("font-awesome-solid:table")
-                .label("build-time")
+                .staticLabel("10")
                 .showColumn("timestamp")
                 .showColumn("user")
                 .showColumn("fullJoke")
@@ -59,14 +62,14 @@ public class JokesDevUIProcessor {
         // 4) Page that show build time data that has been formatted using Qute
         cardPageBuildItem.addPage(Page.quteDataPageBuilder("Qute data")
                 .icon("font-awesome-solid:q")
-                .label("build-time")
+                .dynamicLabelJsonRPCMethodName("numberOfJokesTold")
                 .templateLink("qute-jokes-template.html"));
 
         // 5) Page create with custom web component
         WebComponentPageBuilder webComponentPage = Page.webComponentPageBuilder()
                 .icon("font-awesome-solid:cubes")
                 .componentLink("qwc-jokes-web-components.js")
-                .label("build-and run-time");
+                .streamingLabelJsonRPCMethodName("streamNumberOfJokesTold");
         cardPageBuildItem.addPage(webComponentPage);
         cardsProducer.produce(cardPageBuildItem);
 

@@ -6,8 +6,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Random;
 
-import org.jboss.logging.Logger;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -19,16 +17,20 @@ import io.smallrye.mutiny.operators.multi.processors.BroadcastProcessor;
  * Provide Jokes for JSON-RPC Endpoint
  */
 public class JokesJsonRPCService {
-    private static final Logger LOG = Logger.getLogger(JokesJsonRPCService.class);
     private final ObjectMapper mapper = new ObjectMapper();
     private final Random random = new Random();
     private final BroadcastProcessor<Joke> jokeStream = BroadcastProcessor.create();
 
     private final BroadcastProcessor<Joke> jokeLog = BroadcastProcessor.create();
 
+    private final BroadcastProcessor<Integer> jokeCount = BroadcastProcessor.create();
+
+    private static int jokesTold = 10; // We start with 10 loaded at build time
+
     @Scheduled(every = "10s")
     void freshJoke() {
-        jokeStream.onNext(getJoke());
+        Joke j = getJoke();
+        jokeStream.onNext(j);
     }
 
     public Joke getJoke() {
@@ -42,6 +44,10 @@ public class JokesJsonRPCService {
         joke.setTimestamp(getTimestamp());
 
         jokeLog.onNext(joke);
+
+        jokesTold++;
+
+        jokeCount.onNext(jokesTold);
 
         return joke;
     }
@@ -63,6 +69,14 @@ public class JokesJsonRPCService {
 
     public Multi<Joke> jokeLog() {
         return jokeLog;
+    }
+
+    public int numberOfJokesTold() {
+        return jokesTold;
+    }
+
+    public Multi<Integer> streamNumberOfJokesTold() {
+        return jokeCount;
     }
 
     private String getTimestamp() {

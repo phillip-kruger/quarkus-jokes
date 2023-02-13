@@ -8,7 +8,7 @@ import { LogController } from 'log-controller';
 export class QwcJokesLog extends LitElement {
     jsonRpc = new JsonRpc("Jokes");
     logControl = new LogController(this, "qwc-jokes-log");
-    
+
     static styles = css`
         :host {
             color: var(--quarkus-blue);
@@ -120,7 +120,7 @@ export class QwcJokesLog extends LitElement {
             
             if(last){
                 last.scrollIntoView({
-                     behavior: "smooth",
+                    behavior: "smooth",
                     block: "end"
                 });
             }
