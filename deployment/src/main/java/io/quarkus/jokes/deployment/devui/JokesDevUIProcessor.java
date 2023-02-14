@@ -25,9 +25,6 @@ public class JokesDevUIProcessor {
 
         CardPageBuildItem cardPageBuildItem = new CardPageBuildItem("Jokes");
 
-        // Set custom card
-        cardPageBuildItem.setCustomCard("qwc-jokes-card.js");
-
         // 1) Add build time data
         cardPageBuildItem.addBuildTimeData("jokes", jokesBuildItem.getJokes());
 
@@ -75,6 +72,9 @@ public class JokesDevUIProcessor {
 
         FooterPageBuildItem footerPageBuildItem = new FooterPageBuildItem("Jokes", jokeLogPageBuilder);
         footerProducer.produce(footerPageBuildItem);
+        
+        // 8) Set custom card
+        cardPageBuildItem.setCustomCard("qwc-jokes-card.js");
 
     }
 
