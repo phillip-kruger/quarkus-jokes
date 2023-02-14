@@ -53,9 +53,12 @@ public class JokesDevUIProcessor {
                 .componentLink("qwc-jokes-web-components.js")
                 .streamingLabelJsonRPCMethodName("streamNumberOfJokesTold"));
 
+        //6) Set custom card
+        cardPageBuildItem.setCustomCard("qwc-jokes-card.js");
+
         cardsProducer.produce(cardPageBuildItem);
 
-        // 6) Also add a link in the main menu section
+        // 7) Also add a link in the main menu section
         WebComponentPageBuilder menuItemPageBuilder = Page.webComponentPageBuilder()
                 .icon("font-awesome-regular:face-grin-tongue-wink")
                 .title("Joke")
@@ -64,7 +67,7 @@ public class JokesDevUIProcessor {
         MenuPageBuildItem menuPageBuildItem = new MenuPageBuildItem("Jokes", menuItemPageBuilder);
         menuProducer.produce(menuPageBuildItem);
 
-        // 7) Also add a tab in the footer
+        // 8) Also add a tab in the footer
         WebComponentPageBuilder jokeLogPageBuilder = Page.webComponentPageBuilder()
                 .icon("font-awesome-regular:face-grin-tongue-wink")
                 .title("Joke Log")
@@ -72,9 +75,6 @@ public class JokesDevUIProcessor {
 
         FooterPageBuildItem footerPageBuildItem = new FooterPageBuildItem("Jokes", jokeLogPageBuilder);
         footerProducer.produce(footerPageBuildItem);
-        
-        // 8) Set custom card
-        cardPageBuildItem.setCustomCard("qwc-jokes-card.js");
 
     }
 
