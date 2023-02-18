@@ -4,36 +4,21 @@ import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Random;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import io.quarkus.scheduler.Scheduled;
-import io.smallrye.mutiny.Multi;
-import io.smallrye.mutiny.operators.multi.processors.BroadcastProcessor;
 
 /**
  * Provide Jokes for JSON-RPC Endpoint
  */
 public class JokesJsonRPCService {
-    private final ObjectMapper mapper = new ObjectMapper();
-    private final Random random = new Random();
-    private final BroadcastProcessor<Joke> jokeStream = BroadcastProcessor.create();
-
-    private final BroadcastProcessor<Joke> jokeLog = BroadcastProcessor.create();
-
-    private final BroadcastProcessor<Integer> jokeCount = BroadcastProcessor.create();
-
-    private static int jokesTold = 10; // We start with 10 loaded at build time
-
-    @Scheduled(every = "10s")
-    void freshJoke() {
-        Joke j = getJoke();
-        jokeStream.onNext(j);
-    }
 
     public Joke getJoke() {
+        Joke joke = fetchRandomJoke();
+        return joke;
+    }
+
+    private Joke fetchRandomJoke() {
         Joke joke = getRandomJoke();
         User user = getRandomUser();
 
@@ -43,40 +28,7 @@ public class JokesJsonRPCService {
 
         joke.setTimestamp(getTimestamp());
 
-        jokeLog.onNext(joke);
-
-        jokesTold++;
-
-        jokeCount.onNext(jokesTold);
-
         return joke;
-    }
-
-    public Joke addJoke(String user, String setup, String punchline) {
-        Joke joke = new Joke();
-        joke.setId(Math.abs(random.nextInt()));
-        joke.setUser(user);
-        joke.setSetup(setup);
-        joke.setPunchline(punchline);
-        joke.setTimestamp(getTimestamp());
-        joke.setType("General");
-        return joke;
-    }
-
-    public Multi<Joke> streamJokes() {
-        return jokeStream;
-    }
-
-    public Multi<Joke> jokeLog() {
-        return jokeLog;
-    }
-
-    public int numberOfJokesTold() {
-        return jokesTold;
-    }
-
-    public Multi<Integer> streamNumberOfJokesTold() {
-        return jokeCount;
     }
 
     private String getTimestamp() {
@@ -108,6 +60,7 @@ public class JokesJsonRPCService {
         public User[] results;
     }
 
+    private final ObjectMapper mapper = new ObjectMapper();
     private static User backupUser = new User();
     private static Joke backupJoke = new Joke();
     static {
