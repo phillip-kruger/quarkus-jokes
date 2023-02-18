@@ -9,6 +9,7 @@ export class QwcJokesWebComponents extends LitElement {
     static styles = css`
         a {
             cursor:pointer;
+            padding-left: 10px;
         }
     `;
     
@@ -16,25 +17,25 @@ export class QwcJokesWebComponents extends LitElement {
         _jokes: {state: true},
         _numberOfJokes: {state: true},
         _message: {state: true},
+        _isStreaming: {state: true},
     };
     
     constructor() {
         super();
         this._jokes = jokes;
         this._numberOfJokes = this._jokes.length;
+        this._streamingButtonTitle = "Start streaming";
+        this._isStreaming = false;
     }
 
     connectedCallback() {
         super.connectedCallback();
-        
-        this._observer = this.jsonRpc.streamJokes().onNext(jsonRpcResponse => {
-            this._jokes.push(jsonRpcResponse.result);
-            this._numberOfJokes = this._numberOfJokes++;
-        });
     }
 
     disconnectedCallback() {
-        this._observer.cancel();
+        if(this._isStreaming){
+            this._observer.cancel();
+        }
         super.disconnectedCallback()
     }
 
@@ -46,6 +47,7 @@ export class QwcJokesWebComponents extends LitElement {
             ${this._renderLoadingMessage()}
             </ul>
             <a @click=${() => this._fetchMoreJokes()}>More</a>
+            <a @click=${() => this._startStopStreaming()}>${this._streamingButtonTitle}</a>
             `;
     }
 
@@ -62,6 +64,21 @@ export class QwcJokesWebComponents extends LitElement {
             this._jokes.push(jsonRpcResponse.result);
             this._numberOfJokes++;
         });
+    }
+
+    _startStopStreaming(){
+        if(this._isStreaming){ // Stop it
+            this._isStreaming = false;
+            this._streamingButtonTitle = "Start streaming";
+            this._observer.cancel();
+        }else{ // Start it
+            this._isStreaming = true;
+            this._streamingButtonTitle = "Stop streaming";
+            this._observer = this.jsonRpc.streamJokes().onNext(jsonRpcResponse => {
+                this._jokes.push(jsonRpcResponse.result);
+                this._numberOfJokes = this._numberOfJokes++;
+            });
+        }
     }
 
 }
