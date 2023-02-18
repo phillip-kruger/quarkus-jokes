@@ -1,7 +1,6 @@
 import { LitElement, html, css} from 'lit';
 import { jokes } from 'jokes-data';
 import { JsonRpc } from 'jsonrpc';
-import { notifier } from 'notifier';
 
 export class QwcJokesWebComponents extends LitElement {
     
