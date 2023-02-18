@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,6 +18,14 @@ public class JokesJsonRPCService {
     public Joke getJoke() {
         Joke joke = fetchRandomJoke();
         return joke;
+    }
+
+    public List<Joke> initJokes(Integer size) {
+        List<Joke> initialJokes = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            initialJokes.add(getJoke());
+        }
+        return initialJokes;
     }
 
     private Joke fetchRandomJoke() {

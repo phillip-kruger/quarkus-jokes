@@ -23,7 +23,21 @@ export class QwcJokesWebComponents extends LitElement {
         this._jokes = jokes;
         this._numberOfJokes = this._jokes.length;
     }
-    
+
+    connectedCallback() {
+        super.connectedCallback();
+        this._message = "Initializing some jokes ...";
+        this.jsonRpc.initJokes({size:5}).then(jsonRpcResponse => {
+            this._message = null;
+            this._jokes.push(...jsonRpcResponse.result);
+            this._numberOfJokes = this._numberOfJokes + jsonRpcResponse.result.length;
+        });
+    }
+
+    disconnectedCallback() {
+        super.disconnectedCallback()
+    }
+
     render() {
         return html`<h3>Here are ${this._numberOfJokes} jokes</h3>
             <ul>${this._jokes.map((joke, index) =>
@@ -47,7 +61,6 @@ export class QwcJokesWebComponents extends LitElement {
             this._message = null;
             this._jokes.push(jsonRpcResponse.result);
             this._numberOfJokes++;
-            notifier.showInfoMessage("Wow ! " + this._numberOfJokes + " told already !");
         });
     }
 
