@@ -2,18 +2,37 @@ package io.quarkus.jokes.runtime;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.annotation.PostConstruct;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.smallrye.mutiny.Multi;
+import io.smallrye.mutiny.operators.multi.processors.BroadcastProcessor;
 
 /**
  * Provide Jokes for JSON-RPC Endpoint
  */
 public class JokesJsonRPCService {
+
+    private final BroadcastProcessor<Joke> jokeStream = BroadcastProcessor.create();
+
+    @PostConstruct
+    void init() {
+        Multi.createFrom().ticks().every(Duration.ofSeconds(10)).subscribe().with((item) -> {
+            jokeStream.onNext(getJoke());
+        });
+    }
+
+    public Multi<Joke> streamJokes() {
+        return jokeStream;
+    }
 
     public Joke getJoke() {
         Joke joke = fetchRandomJoke();

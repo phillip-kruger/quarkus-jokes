@@ -26,15 +26,15 @@ export class QwcJokesWebComponents extends LitElement {
 
     connectedCallback() {
         super.connectedCallback();
-        this._message = "Initializing some jokes ...";
-        this.jsonRpc.initJokes({size:5}).then(jsonRpcResponse => {
-            this._message = null;
-            this._jokes.push(...jsonRpcResponse.result);
-            this._numberOfJokes = this._numberOfJokes + jsonRpcResponse.result.length;
+        
+        this._observer = this.jsonRpc.streamJokes().onNext(jsonRpcResponse => {
+            this._jokes.push(jsonRpcResponse.result);
+            this._numberOfJokes = this._numberOfJokes++;
         });
     }
 
     disconnectedCallback() {
+        this._observer.cancel();
         super.disconnectedCallback()
     }
 
