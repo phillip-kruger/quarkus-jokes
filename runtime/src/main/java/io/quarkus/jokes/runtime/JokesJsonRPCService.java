@@ -22,6 +22,8 @@ import io.smallrye.mutiny.operators.multi.processors.BroadcastProcessor;
 public class JokesJsonRPCService {
 
     private final BroadcastProcessor<Joke> jokeStream = BroadcastProcessor.create();
+    private final BroadcastProcessor<Integer> countStream = BroadcastProcessor.create();
+    private static int numberOfJokesTold = 10;
 
     @PostConstruct
     void init() {
@@ -35,8 +37,14 @@ public class JokesJsonRPCService {
     }
 
     public Joke getJoke() {
+        numberOfJokesTold++;
+        countStream.onNext(numberOfJokesTold);
         Joke joke = fetchRandomJoke();
         return joke;
+    }
+
+    public Multi<Integer> getNumberOfJokesTold() {
+        return countStream;
     }
 
     public List<Joke> initJokes(Integer size) {
