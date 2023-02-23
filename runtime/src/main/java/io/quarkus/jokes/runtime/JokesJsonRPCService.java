@@ -23,11 +23,13 @@ public class JokesJsonRPCService {
 
     private final BroadcastProcessor<Joke> jokeStream = BroadcastProcessor.create();
     private final BroadcastProcessor<Integer> countStream = BroadcastProcessor.create();
+    private final BroadcastProcessor<Joke> jokeLog = BroadcastProcessor.create();
+
     private static int numberOfJokesTold = 10;
 
     @PostConstruct
     void init() {
-        Multi.createFrom().ticks().every(Duration.ofSeconds(10)).subscribe().with((item) -> {
+        Multi.createFrom().ticks().every(Duration.ofHours(4)).subscribe().with((item) -> {
             jokeStream.onNext(getJoke());
         });
     }
@@ -40,11 +42,16 @@ public class JokesJsonRPCService {
         numberOfJokesTold++;
         countStream.onNext(numberOfJokesTold);
         Joke joke = fetchRandomJoke();
+        jokeLog.onNext(joke);
         return joke;
     }
 
     public Multi<Integer> getNumberOfJokesTold() {
         return countStream;
+    }
+
+    public Multi<Joke> jokeLog() {
+        return jokeLog;
     }
 
     public List<Joke> initJokes(Integer size) {
