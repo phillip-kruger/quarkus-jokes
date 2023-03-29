@@ -1,9 +1,9 @@
 import { LitElement, html, css} from 'lit';
-import { pages } from 'jokes-data';
+import { pages } from 'build-time-data';
 import { JsonRpc } from 'jsonrpc';
 
 export class QwcJokesCard extends LitElement {
-    jsonRpc = new JsonRpc("Jokes");
+    jsonRpc = new JsonRpc(this);
     
     static styles = css`
         .description {

@@ -6,8 +6,8 @@ import { LogController } from 'log-controller';
  * This component logs all jokes to demonstrate the log tab participation
  */
 export class QwcJokesLog extends LitElement {
-    jsonRpc = new JsonRpc("Jokes");
-    logControl = new LogController(this, "qwc-jokes-log");
+    jsonRpc = new JsonRpc(this);
+    logControl = new LogController(this);
 
     static styles = css`
         :host {

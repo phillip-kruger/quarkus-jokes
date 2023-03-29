@@ -8,7 +8,6 @@ import io.quarkus.devui.spi.page.CardPageBuildItem;
 import io.quarkus.devui.spi.page.FooterPageBuildItem;
 import io.quarkus.devui.spi.page.MenuPageBuildItem;
 import io.quarkus.devui.spi.page.Page;
-import io.quarkus.devui.spi.page.WebComponentPageBuilder;
 import io.quarkus.jokes.deployment.JokesBuildItem;
 import io.quarkus.jokes.runtime.JokesJsonRPCService;
 
@@ -23,7 +22,9 @@ public class JokesDevUIProcessor {
             BuildProducer<FooterPageBuildItem> footerProducer,
             JokesBuildItem jokesBuildItem) {
 
-        CardPageBuildItem cardPageBuildItem = new CardPageBuildItem("Jokes");
+        // Cards
+
+        CardPageBuildItem cardPageBuildItem = new CardPageBuildItem();
 
         cardPageBuildItem.addBuildTimeData("jokes", jokesBuildItem.getJokes());
 
@@ -56,27 +57,37 @@ public class JokesDevUIProcessor {
 
         cardsProducer.produce(cardPageBuildItem);
 
-        WebComponentPageBuilder menuItemPageBuilder = Page.webComponentPageBuilder()
-                .icon("font-awesome-regular:face-grin-tongue-wink")
-                .title("Joke")
-                .componentLink("qwc-jokes-menu.js");
+        // Menu
 
-        MenuPageBuildItem menuPageBuildItem = new MenuPageBuildItem("Jokes", menuItemPageBuilder);
+        MenuPageBuildItem menuPageBuildItem = new MenuPageBuildItem();
+
+        menuPageBuildItem.addPage(Page.webComponentPageBuilder()
+                .icon("font-awesome-regular:face-grin-tongue-wink")
+                .title("One Joke")
+                .componentLink("qwc-jokes-menu.js"));
+
+        menuPageBuildItem.addPage(Page.webComponentPageBuilder()
+                .title("Jokes")
+                .icon("font-awesome-solid:cubes")
+                .componentLink("qwc-jokes-web-components.js"));
 
         menuProducer.produce(menuPageBuildItem);
 
-        WebComponentPageBuilder jokeLogPageBuilder = Page.webComponentPageBuilder()
+        // Footer
+
+        FooterPageBuildItem footerPageBuildItem = new FooterPageBuildItem();
+
+        footerPageBuildItem.addPage(Page.webComponentPageBuilder()
                 .icon("font-awesome-regular:face-grin-tongue-wink")
                 .title("Joke Log")
-                .componentLink("qwc-jokes-log.js");
+                .componentLink("qwc-jokes-log.js"));
 
-        FooterPageBuildItem footerPageBuildItem = new FooterPageBuildItem("Jokes", jokeLogPageBuilder);
         footerProducer.produce(footerPageBuildItem);
 
     }
 
     @BuildStep(onlyIf = IsDevelopment.class)
     JsonRPCProvidersBuildItem createJsonRPCService() {
-        return new JsonRPCProvidersBuildItem("Jokes", JokesJsonRPCService.class);
+        return new JsonRPCProvidersBuildItem(JokesJsonRPCService.class);
     }
 }

@@ -1,5 +1,5 @@
 import { LitElement, html, css} from 'lit';
-import { jokes } from 'jokes-data';
+import { jokes } from 'build-time-data';
 import { JsonRpc } from 'jsonrpc';
 import { notifier } from 'notifier';
 import '@vaadin/message-list';
@@ -9,7 +9,7 @@ import '@vaadin/checkbox';
 
 export class QwcJokesWebComponents extends LitElement {
     
-    jsonRpc = new JsonRpc("Jokes");
+    jsonRpc = new JsonRpc(this);
     
     static styles = css`
         a {

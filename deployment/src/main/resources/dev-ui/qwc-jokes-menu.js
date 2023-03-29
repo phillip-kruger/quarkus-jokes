@@ -5,7 +5,7 @@ import { JsonRpc } from 'jsonrpc';
  * This component shows how to add to the section menu
  */
 export class QwcJokesMenu extends LitElement {
-    jsonRpc = new JsonRpc("Jokes");
+    jsonRpc = new JsonRpc(this);
     
     static styles = css`
         :host {
