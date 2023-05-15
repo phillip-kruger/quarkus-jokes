@@ -28,6 +28,15 @@ public class JokesDevUIProcessor {
 
         cardPageBuildItem.addBuildTimeData("jokes", jokesBuildItem.getJokes());
 
+        //cardPageBuildItem.addPage(Page.externalPageBuilder("Dynamic Link")
+        //        .icon("font-awesome-brands:js")
+        //        .dynamicUrlJsonRPCMethodName("getDynamicLink"));
+
+        //cardPageBuildItem.addPage(Page.externalPageBuilder("Dynamic Link external")
+        //        .icon("font-awesome-brands:js")
+        //        .doNotEmbed()
+        //        .dynamicUrlJsonRPCMethodName("getDynamicLink"));
+
         cardPageBuildItem.addPage(Page.rawDataPageBuilder("Raw data")
                 .icon("font-awesome-brands:js")
                 .buildTimeDataKey("jokes"));

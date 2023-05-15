@@ -38,6 +38,11 @@ public class JokesJsonRPCService {
         return jokeStream;
     }
 
+    public String getDynamicLink() {
+        // Here get your link dynamicly
+        return "/q/info";
+    }
+
     public Joke getJoke() {
         numberOfJokesTold++;
         countStream.onNext(numberOfJokesTold);
