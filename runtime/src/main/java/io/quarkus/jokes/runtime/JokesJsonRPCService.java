@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import jakarta.annotation.PostConstruct;
 
@@ -15,6 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.operators.multi.processors.BroadcastProcessor;
+import io.vertx.core.http.Cookie;
 
 /**
  * Provide Jokes for JSON-RPC Endpoint
@@ -27,11 +29,21 @@ public class JokesJsonRPCService {
 
     private static int numberOfJokesTold = 10;
 
+    private Set<Cookie> cookies = Set.of();
+
     @PostConstruct
     void init() {
         Multi.createFrom().ticks().every(Duration.ofHours(4)).subscribe().with((item) -> {
             jokeStream.onNext(getJoke());
         });
+    }
+
+    public void setCookies(Set<Cookie> cookies) {
+        this.cookies = cookies;
+    }
+
+    public Set<Cookie> getCookies() {
+        return this.cookies;
     }
 
     public Multi<Joke> streamJokes() {

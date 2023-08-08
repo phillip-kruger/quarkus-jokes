@@ -3,6 +3,8 @@ package io.quarkus.jokes.deployment.devui;
 import io.quarkus.deployment.IsDevelopment;
 import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
+import io.quarkus.deployment.annotations.ExecutionTime;
+import io.quarkus.deployment.annotations.Record;
 import io.quarkus.devui.spi.JsonRPCProvidersBuildItem;
 import io.quarkus.devui.spi.page.CardPageBuildItem;
 import io.quarkus.devui.spi.page.FooterPageBuildItem;
@@ -10,6 +12,11 @@ import io.quarkus.devui.spi.page.MenuPageBuildItem;
 import io.quarkus.devui.spi.page.Page;
 import io.quarkus.jokes.deployment.JokesBuildItem;
 import io.quarkus.jokes.runtime.JokesJsonRPCService;
+import io.quarkus.jokes.runtime.JokesRecorder;
+import io.quarkus.vertx.http.deployment.NonApplicationRootPathBuildItem;
+import io.quarkus.vertx.http.deployment.RouteBuildItem;
+import io.vertx.core.Handler;
+import io.vertx.ext.web.RoutingContext;
 
 /**
  * This example show how to show some pages in Dev UI
@@ -64,6 +71,10 @@ public class JokesDevUIProcessor {
                 .icon("font-awesome-solid:cubes")
                 .componentLink("qwc-jokes-web-components.js"));
 
+        cardPageBuildItem.addPage(Page.webComponentPageBuilder()
+                .icon("font-awesome-solid:cookie-bite")
+                .componentLink("qwc-jokes-cookies.js"));
+
         cardsProducer.produce(cardPageBuildItem);
 
         // Menu
@@ -98,5 +109,19 @@ public class JokesDevUIProcessor {
     @BuildStep(onlyIf = IsDevelopment.class)
     JsonRPCProvidersBuildItem createJsonRPCService() {
         return new JsonRPCProvidersBuildItem(JokesJsonRPCService.class);
+    }
+
+    @BuildStep(onlyIf = IsDevelopment.class)
+    @Record(ExecutionTime.RUNTIME_INIT)
+    void registerSomeEndpoint(
+            BuildProducer<RouteBuildItem> routeProducer,
+            JokesRecorder recorder,
+            NonApplicationRootPathBuildItem nonApplicationRootPathBuildItem) {
+
+        Handler<RoutingContext> handler = recorder.jokesHandler();
+        routeProducer.produce(nonApplicationRootPathBuildItem.routeBuilder()
+                .route("jokes-endpoint")
+                .handler(handler)
+                .build());
     }
 }
