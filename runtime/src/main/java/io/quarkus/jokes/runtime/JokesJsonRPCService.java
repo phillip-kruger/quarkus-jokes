@@ -26,7 +26,7 @@ public class JokesJsonRPCService {
     private final BroadcastProcessor<Joke> jokeStream = BroadcastProcessor.create();
     private final BroadcastProcessor<Integer> countStream = BroadcastProcessor.create();
     private final BroadcastProcessor<Joke> jokeLog = BroadcastProcessor.create();
-
+    private final BroadcastProcessor<Joke> errorStream = BroadcastProcessor.create();
     private static int numberOfJokesTold = 10;
 
     private Set<Cookie> cookies = Set.of();
@@ -36,6 +36,11 @@ public class JokesJsonRPCService {
         Multi.createFrom().ticks().every(Duration.ofHours(4)).subscribe().with((item) -> {
             jokeStream.onNext(getJoke());
         });
+
+        Multi.createFrom().ticks().every(Duration.ofMinutes(1)).subscribe().with((item) -> {
+            errorStream.onError(new Exception("Simulate some exception"));
+        });
+
     }
 
     public void setCookies(Set<Cookie> cookies) {
@@ -48,6 +53,10 @@ public class JokesJsonRPCService {
 
     public Multi<Joke> streamJokes() {
         return jokeStream;
+    }
+
+    public Multi<Joke> errorStream() {
+        return errorStream;
     }
 
     public String getDynamicLink() {

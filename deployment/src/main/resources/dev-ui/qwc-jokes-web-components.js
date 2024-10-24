@@ -98,6 +98,11 @@ export class QwcJokesWebComponents extends LitElement {
                 this._addToJokes(jsonRpcResponse.result);
                 this._numberOfJokes = this._numberOfJokes++;
             });
+            this._errorObserver = this.jsonRpc.errorStream().onNext(jsonRpcResponse => {
+                console.log(jsonRpcResponse);
+            }).onError(error => {
+                console.log(error);
+            });
         }else{
             this._observer.cancel();
             notifier.showWarningMessage("Streaming jokes canceled...");
