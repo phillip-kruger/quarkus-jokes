@@ -1,5 +1,6 @@
 import { LitElement, html, css} from 'lit';
 import { JsonRpc } from 'jsonrpc';
+import { someKey } from 'build-time-data';
 
 /**
  * This component can be shared by anyone
@@ -32,7 +33,7 @@ export class QwcJoke extends LitElement {
     
     constructor() {
         super();
-        this._joke = "Loading ...";
+        this._joke = "Loading ..." + someKey;
     }
     
     connectedCallback() {
