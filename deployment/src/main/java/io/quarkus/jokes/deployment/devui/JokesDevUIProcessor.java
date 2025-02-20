@@ -1,11 +1,21 @@
 package io.quarkus.jokes.deployment.devui;
 
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import io.quarkus.deployment.IsDevelopment;
 import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.deployment.annotations.ExecutionTime;
 import io.quarkus.deployment.annotations.Record;
+import io.quarkus.deployment.dev.ai.AIBuildItem;
+import io.quarkus.deployment.dev.ai.AIClient;
+import io.quarkus.deployment.dev.ai.DynamicOutput;
 import io.quarkus.devui.spi.JsonRPCProvidersBuildItem;
+import io.quarkus.devui.spi.buildtime.BuildTimeActionBuildItem;
 import io.quarkus.devui.spi.page.CardPageBuildItem;
 import io.quarkus.devui.spi.page.FooterPageBuildItem;
 import io.quarkus.devui.spi.page.MenuPageBuildItem;
@@ -27,7 +37,8 @@ public class JokesDevUIProcessor {
     void createJokes(BuildProducer<CardPageBuildItem> cardsProducer,
             BuildProducer<MenuPageBuildItem> menuProducer,
             BuildProducer<FooterPageBuildItem> footerProducer,
-            JokesBuildItem jokesBuildItem) {
+            JokesBuildItem jokesBuildItem,
+            AIBuildItem aIBuildItem) {
 
         // Cards
 
@@ -75,6 +86,16 @@ public class JokesDevUIProcessor {
                 .icon("font-awesome-solid:cookie-bite")
                 .componentLink("qwc-jokes-cookies.js"));
 
+        try {
+
+            cardPageBuildItem.addPage(Page.webComponentPageBuilder()
+                    .title(getFunnyWord(aIBuildItem))
+                    .icon("font-awesome-solid:face-grin-squint-tears")
+                    .dynamicLabelJsonRPCMethodName("funnyWord")
+                    .componentLink("qwc-jokes-ai.js"));
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
         cardsProducer.produce(cardPageBuildItem);
 
         // Menu
@@ -124,4 +145,32 @@ public class JokesDevUIProcessor {
                 .handler(handler)
                 .build());
     }
+
+    @BuildStep(onlyIf = IsDevelopment.class)
+    BuildTimeActionBuildItem createBuildTimeActions(AIBuildItem aIBuildItem) {
+        BuildTimeActionBuildItem buildTimeActionBuildItem = new BuildTimeActionBuildItem();
+
+        buildTimeActionBuildItem.addAction("funnyWord", ignored -> {
+            return getFunnyWord(aIBuildItem);
+        });
+
+        buildTimeActionBuildItem.addAction("getAIJoke", params -> {
+            AIClient aiClient = aIBuildItem.getAIClient();
+            return aiClient.dynamic("Tell a funny joke about why {{something}} is better that {{anotherthing}}", params);
+        });
+
+        return buildTimeActionBuildItem;
+    }
+
+    private String getFunnyWord(AIBuildItem aIBuildItem) {
+        try {
+            CompletableFuture<DynamicOutput> dynamic = aIBuildItem.getAIClient()
+                    .dynamic("Provide a funny sounding word. Just the word, nothing else", Map.of());
+            DynamicOutput dynamicOutput = dynamic.get(15, TimeUnit.SECONDS);
+            return dynamicOutput.jsonResponse();
+        } catch (InterruptedException | ExecutionException | TimeoutException ex) {
+            return "googoogaga";
+        }
+    }
+
 }
