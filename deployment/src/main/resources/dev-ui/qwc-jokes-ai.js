@@ -14,6 +14,9 @@ export class QwcJokesAI extends LitElement {
             flex-direction: column;
             align-items: center;
         }
+        .joke {
+            padding: 20px;
+        }
     `;
     
     static properties = {
@@ -42,7 +45,7 @@ export class QwcJokesAI extends LitElement {
     render() {
         return html`<div class="input">Tell me a joke about why ${this._renderSomethingCombo()} is better than ${this._renderAnotherthingCombo()}</div>
                     ${this._renderButtonOrProgressBar()}
-                    ${this._joke}`;
+                    <div class="joke">${this._joke}</div>`;
     }
     
     _renderSomethingCombo(){
@@ -67,7 +70,8 @@ export class QwcJokesAI extends LitElement {
         if(this._showProgress){
             return html`<vaadin-progress-bar indeterminate></vaadin-progress-bar>`;
         }else {
-            return html`<vaadin-button @click=${this._fetchJoke} theme="tertiary"> Go !</vaadin-button>`;
+            return html`<vaadin-button @click=${this._fetchJokeDeployment} theme="tertiary"> Go (deployment)</vaadin-button> 
+                        <vaadin-button @click=${this._fetchJokeRuntime} theme="tertiary"> Go (runtime)</vaadin-button>`;
         }
     }
     
@@ -79,13 +83,24 @@ export class QwcJokesAI extends LitElement {
         this._anotherthing = event.target.value;
     }
     
-    _fetchJoke(){
+    _fetchJokeDeployment(){
         if(this._something && this._anotherthing) {
             this._showProgress = true;
             this._joke = null;
-            this.jsonRpc.getAIJoke({something: this._something, anotherthing: this._anotherthing}).then(jsonRpcResponse => {
+            this.jsonRpc.getAIJokeInDeployment({something: this._something, anotherthing: this._anotherthing}).then(jsonRpcResponse => {
                 this._showProgress = false;
-                this._joke = jsonRpcResponse.result.jsonResponse;
+                this._joke = jsonRpcResponse.result.joke;
+            });
+        }
+    }
+    
+    _fetchJokeRuntime(){
+        if(this._something && this._anotherthing) {
+            this._showProgress = true;
+            this._joke = null;
+            this.jsonRpc.getAIJokeInRuntime({something: this._something, anotherthing: this._anotherthing}).then(jsonRpcResponse => {
+                this._showProgress = false;
+                this._joke = jsonRpcResponse.result.joke;
             });
         }
     }

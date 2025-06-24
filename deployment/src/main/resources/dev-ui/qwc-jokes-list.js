@@ -6,8 +6,12 @@ import '@vaadin/message-list';
 import '@vaadin/progress-bar';
 import '@vaadin/button';      
 import '@vaadin/checkbox';
+import 'qui-assistant-button';
+import 'qui-assistant-warning';
+import { observeState } from 'lit-element-state';
+import { assistantState } from 'assistant-state';
 
-export class QwcJokesWebComponents extends LitElement {
+export class QwcJokesList extends observeState(LitElement) {
     
     jsonRpc = new JsonRpc(this);
     
@@ -25,7 +29,7 @@ export class QwcJokesWebComponents extends LitElement {
         }
 
         .buttonBar .button {
-            width: 100%;
+            width: 33%;
         }
     `;
     
@@ -38,18 +42,18 @@ export class QwcJokesWebComponents extends LitElement {
     
     constructor() {
         super();
-        let items = [];
-        jokes.forEach((joke) =>{
-            var item = this._toJokeItem(joke);
-            items.push(item);
-        });
-        this._jokes = items;
-        this._numberOfJokes = this._jokes.length;
+        this._jokes = [];
+        this._numberOfJokes = 0;
         this._isStreaming = false;
     }
 
     connectedCallback() {
         super.connectedCallback();
+        jokes.forEach((joke) =>{
+            var item = this._toJokeItem(joke);
+            this._jokes.push(item);
+        });
+        this._numberOfJokes = this._jokes.length;
     }
 
     disconnectedCallback() {
@@ -68,10 +72,19 @@ export class QwcJokesWebComponents extends LitElement {
                 <vaadin-button class="button" theme="success" @click=${() => this._fetchMoreJokes()}>
                     <vaadin-icon icon="font-awesome-solid:comment"></vaadin-icon> Tell me more jokes
                 </vaadin-button>    
+                ${this._renderAssistantButton()}
                 <vaadin-checkbox class="button" label="Stream new jokes continuously" @input=${(e) =>this._startStopStreaming(e)}></vaadin-checkbox>
             </div>
             `;
     }
+
+    _renderAssistantButton(){
+        if(assistantState.current.isConfigured){
+            return html`<qui-assistant-button class="button" title="Ask Quarkus Assistant to tell a joke" @click="${() => this._fetchMoreJokesWithAI()}">
+                            Tell me more jokes using AI
+                        </qui-assistant-button>`;
+        }
+     }
 
     _renderLoadingMessage(){
         if(this._message){
@@ -85,6 +98,21 @@ export class QwcJokesWebComponents extends LitElement {
         this.jsonRpc.getJoke().then(jsonRpcResponse => {
             this._message = null;
             this._addToJokes(jsonRpcResponse.result);
+            this._numberOfJokes++;
+        });
+    }
+
+    _fetchMoreJokesWithAI(){
+        this._message = "Fetching new joke (with AI)...";
+        this.jsonRpc.getAiJoke().then(jsonRpcResponse => {
+            this._message = null;
+            
+            this._addToJokes({
+                fullJoke: jsonRpcResponse.result.joke,
+                timestamp: this._currentTime(),
+                user: "Chappie",
+                profilePic: "https://avatars.githubusercontent.com/u/164117619?s=200&v=4"
+            });
             this._numberOfJokes++;
         });
     }
@@ -126,5 +154,19 @@ export class QwcJokesWebComponents extends LitElement {
         ];
     }
 
+    _currentTime() {
+        const now = new Date();
+
+        const yyyy = now.getFullYear();
+        const MM = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+        const dd = String(now.getDate()).padStart(2, '0');
+
+        const hh = String(now.getHours()).padStart(2, '0');
+        const mm = String(now.getMinutes()).padStart(2, '0');
+        const ss = String(now.getSeconds()).padStart(2, '0');
+
+        return `${yyyy}-${MM}-${dd} ${hh}:${mm}:${ss}`;
+    }
+
 }
-customElements.define('qwc-jokes-web-components', QwcJokesWebComponents);
+customElements.define('qwc-jokes-list', QwcJokesList);

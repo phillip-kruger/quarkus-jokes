@@ -1,5 +1,4 @@
 import { LitElement, html, css} from 'lit';
-import './../io.quarkiverse.jokes.quarkus-jokes-common/qwc-joke.js';
 
 /**
  * This component shows how to add to the section menu

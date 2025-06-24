@@ -7,13 +7,19 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.inject.Inject;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.quarkus.assistant.runtime.dev.Assistant;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.operators.multi.processors.BroadcastProcessor;
 import io.vertx.core.http.Cookie;
@@ -22,6 +28,9 @@ import io.vertx.core.http.Cookie;
  * Provide Jokes for JSON-RPC Endpoint
  */
 public class JokesJsonRPCService {
+
+    @Inject
+    Optional<Assistant> assistant;
 
     private final BroadcastProcessor<Joke> jokeStream = BroadcastProcessor.create();
     private final BroadcastProcessor<Integer> countStream = BroadcastProcessor.create();
@@ -72,6 +81,15 @@ public class JokesJsonRPCService {
         return joke;
     }
 
+    public CompletionStage<Map<String, String>> getAiJoke() {
+        if (assistant.isPresent()) {
+            return assistant.get().assistBuilder()
+                    .userMessage("Tell me a funny joke")
+                    .assist();
+        }
+        return CompletableFuture.failedStage(new RuntimeException("Assistant is not available"));
+    }
+
     public Multi<Integer> getNumberOfJokesTold() {
         return countStream;
     }
@@ -86,6 +104,18 @@ public class JokesJsonRPCService {
             initialJokes.add(getJoke());
         }
         return initialJokes;
+    }
+
+    public CompletionStage<Map<String, String>> getAIJokeInRuntime(String something, String anotherthing) {
+        if (assistant.isPresent()) {
+
+            return assistant.get().assistBuilder()
+                    .userMessage(USER_MESSAGE)
+                    .addVariable("something", something)
+                    .addVariable("anotherthing", anotherthing)
+                    .assist();
+        }
+        return CompletableFuture.failedStage(new RuntimeException("Assistant is not available"));
     }
 
     private Joke fetchRandomJoke() {
@@ -145,4 +175,5 @@ public class JokesJsonRPCService {
         backupJoke.setSetup("I'm afraid for the calendar.");
         backupJoke.setPunchline("Its days are numbered.");
     }
+    private static final String USER_MESSAGE = "Make a joke about {{something}} is better than {{anotherthing}}";
 }
