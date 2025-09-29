@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.quarkus.assistant.runtime.dev.Assistant;
+import io.quarkus.runtime.annotations.JsonRpcDescription;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.operators.multi.processors.BroadcastProcessor;
 import io.vertx.core.http.Cookie;
@@ -73,6 +74,7 @@ public class JokesJsonRPCService {
         return "/q/info";
     }
 
+    @JsonRpcDescription("Tell a joke")
     public Joke getJoke() {
         numberOfJokesTold++;
         countStream.onNext(numberOfJokesTold);

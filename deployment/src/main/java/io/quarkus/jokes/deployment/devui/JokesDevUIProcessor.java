@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 
+import io.quarkus.assistant.deployment.spi.AssistantConsoleBuildItem;
 import io.quarkus.assistant.runtime.dev.Assistant;
 import io.quarkus.deployment.IsDevelopment;
 import io.quarkus.deployment.IsLocalDevelopment;
@@ -16,6 +17,7 @@ import io.quarkus.devui.spi.page.CardPageBuildItem;
 import io.quarkus.devui.spi.page.FooterPageBuildItem;
 import io.quarkus.devui.spi.page.MenuPageBuildItem;
 import io.quarkus.devui.spi.page.Page;
+import io.quarkus.devui.spi.welcome.DynamicWelcomeBuildItem;
 import io.quarkus.devui.spi.workspace.Action;
 import io.quarkus.devui.spi.workspace.Display;
 import io.quarkus.devui.spi.workspace.DisplayType;
@@ -75,7 +77,7 @@ public class JokesDevUIProcessor {
                 Action.actionBuilder()
                         .label("Knock-knock")
                         .function((t) -> {
-                            return "Who's there ?";
+                            return Map.of("content", "Who's there ?");
                         })
                         .display(Display.notification)
                         .displayType(DisplayType.raw)
@@ -131,6 +133,11 @@ public class JokesDevUIProcessor {
         cardsProducer.produce(cardPageBuildItem);
     }
 
+    @BuildStep(onlyIf = IsDevelopment.class)
+    public DynamicWelcomeBuildItem createDynamicWelcomeData(JokesBuildItem jokesBuildItem) {
+        return new DynamicWelcomeBuildItem("<span>" + jokesBuildItem.getJokes().get(0).getFullJoke() + "</span>");
+    }
+
     @BuildStep(onlyIf = IsLocalDevelopment.class)
     void createJokesMenu(BuildProducer<MenuPageBuildItem> menuProducer) {
 
@@ -157,22 +164,33 @@ public class JokesDevUIProcessor {
         footerProducer.produce(footerPageBuildItem);
     }
 
-    @BuildStep
+    @BuildStep(onlyIf = IsLocalDevelopment.class)
     void createBuildTimeActions(BuildProducer<BuildTimeActionBuildItem> buildTimeActionProducer) {
-        BuildTimeActionBuildItem bta = new BuildTimeActionBuildItem();
+        buildTimeActionProducer.produce(new BuildTimeActionBuildItem().actionBuilder()
+                .methodName("getAIJokeInDeployment")
+                .assistantFunction((a, p) -> {
+                    Assistant assistant = (Assistant) a;
 
-        bta.addAssistantAction("getAIJokeInDeployment", (a, p) -> {
-            Assistant assistant = (Assistant) a;
-
-            return assistant.assistBuilder()
-                    .userMessage(USER_MESSAGE)
-                    .variables(p)
-                    .assist();
-        });
-        buildTimeActionProducer.produce(bta);
+                    return assistant.assistBuilder()
+                            .userMessage(USER_MESSAGE)
+                            .variables(p)
+                            .assist();
+                }).build());
     }
 
-    @BuildStep(onlyIf = IsDevelopment.class)
+    @BuildStep(onlyIf = IsLocalDevelopment.class)
+    AssistantConsoleBuildItem createCliAssistantEntry() {
+        return AssistantConsoleBuildItem.builder()
+                .description("Let assistant tell you a joke")
+                .key('@')
+                .function((a) -> {
+                    return a.assistBuilder()
+                            .userMessage("Tell a funny joke")
+                            .assist();
+                }).build();
+    }
+
+    @BuildStep(onlyIf = IsLocalDevelopment.class)
     JsonRPCProvidersBuildItem createJsonRPCService() {
         return new JsonRPCProvidersBuildItem(JokesJsonRPCService.class);
     }

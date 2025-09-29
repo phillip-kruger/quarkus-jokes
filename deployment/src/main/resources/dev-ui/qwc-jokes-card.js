@@ -25,7 +25,7 @@ export class QwcJokesCard extends LitElement {
     static properties = {
         description: {type: String},
         _lastPage: {state: false},
-        _joke: {state:true},
+        _joke: {state:true}
     };
     
     constructor() {

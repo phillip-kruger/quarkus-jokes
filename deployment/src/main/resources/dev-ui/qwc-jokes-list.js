@@ -10,10 +10,12 @@ import 'qui-assistant-button';
 import 'qui-assistant-warning';
 import { observeState } from 'lit-element-state';
 import { assistantState } from 'assistant-state';
+import { StorageController } from 'storage-controller';
 
 export class QwcJokesList extends observeState(LitElement) {
     
     jsonRpc = new JsonRpc(this);
+    storageControl = new StorageController(this, true);
     
     static styles = css`
         a {
@@ -37,7 +39,7 @@ export class QwcJokesList extends observeState(LitElement) {
         _jokes: {state: true},
         _numberOfJokes: {state: true},
         _message: {state: true},
-        _isStreaming: {state: true},
+        _isStreaming: {state: true}
     };
     
     constructor() {
@@ -98,6 +100,7 @@ export class QwcJokesList extends observeState(LitElement) {
         this.jsonRpc.getJoke().then(jsonRpcResponse => {
             this._message = null;
             this._addToJokes(jsonRpcResponse.result);
+            this.storageControl.set("joke", jsonRpcResponse.result.fullJoke);
             this._numberOfJokes++;
         });
     }
