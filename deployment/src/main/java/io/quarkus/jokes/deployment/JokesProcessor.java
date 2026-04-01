@@ -6,6 +6,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+
+import org.jboss.logging.Logger;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,7 +20,10 @@ import io.quarkus.jokes.runtime.User;
 
 class JokesProcessor {
     private static final String FEATURE = "jokes";
+    public static final Random RANDOM = new Random();
     private final ObjectMapper mapper = new ObjectMapper();
+
+    private static final Logger log = Logger.getLogger(JokesProcessor.class);
 
     @BuildStep
     FeatureBuildItem feature() {
@@ -31,13 +37,15 @@ class JokesProcessor {
         User[] users = getTenUsers();
 
         List<Joke> jokesAndPeople = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < jokes.length; i++) {
             Joke joke = jokes[i];
-            User user = users[i];
 
             // Add a random user
-            joke.setUser(user.getFullName());
-            joke.setProfilePic(user.getProfileIcon());
+            if (users.length > 0) {
+                User user = users[RANDOM.nextInt(users.length)];
+                joke.setUser(user.getFullName());
+                joke.setProfilePic(user.getProfileIcon());
+            }
 
             // Add a timestamp
             LocalDateTime now = LocalDateTime.now();
@@ -56,7 +64,11 @@ class JokesProcessor {
         try {
             return mapper.readValue(new URL("https://official-joke-api.appspot.com/jokes/ten"), Joke[].class);
         } catch (IOException ex) {
-            throw new RuntimeException(ex);
+            log.warn(ex);
+            Joke joke = new Joke();
+            joke.setSetup("What do you call an offline server?");
+            joke.setPunchline("A toaster.");
+            return new Joke[] { joke };
         }
     }
 
@@ -64,7 +76,9 @@ class JokesProcessor {
         try {
             return mapper.readValue(new URL("https://randomuser.me/api?results=10"), Results.class).results;
         } catch (IOException ex) {
-            throw new RuntimeException(ex);
+            log.warn(ex);
+
+            return new User[] {};
         }
     }
 

@@ -66,7 +66,8 @@ export class QwcJokesList extends observeState(LitElement) {
     }
 
     render() {
-        return html`<h3>Here are ${this._numberOfJokes} jokes</h3>
+        return html`<h3>Here ${this._numberOfJokes > 1 ? "are" : "is"} ${this._numberOfJokes}
+                joke${this._numberOfJokes > 1 ? "s" : ""}</h3>
             <vaadin-message-list .items="${this._jokes}"></vaadin-message-list>
             
             ${this._renderLoadingMessage()}
