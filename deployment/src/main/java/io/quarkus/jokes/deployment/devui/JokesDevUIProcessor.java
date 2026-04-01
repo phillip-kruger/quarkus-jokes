@@ -135,7 +135,12 @@ public class JokesDevUIProcessor {
 
     @BuildStep(onlyIf = IsDevelopment.class)
     public DynamicWelcomeBuildItem createDynamicWelcomeData(JokesBuildItem jokesBuildItem) {
-        return new DynamicWelcomeBuildItem("<span>" + jokesBuildItem.getJokes().get(0).getFullJoke() + "</span>");
+        if (!jokesBuildItem.getJokes().isEmpty()) {
+            return new DynamicWelcomeBuildItem("<span>" + jokesBuildItem.getJokes().get(0).getFullJoke() + "</span>");
+        } else {
+            return new DynamicWelcomeBuildItem("<span></span>");
+
+        }
     }
 
     @BuildStep(onlyIf = IsLocalDevelopment.class)
