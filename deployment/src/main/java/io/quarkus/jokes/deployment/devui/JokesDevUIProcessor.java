@@ -42,9 +42,10 @@ public class JokesDevUIProcessor {
                             input.put("path", input.get("path").replace(".java", ".joke"));
                             return t;
                         })
+                        // To update the file in place, remove the path converter
                         .pathConverter((t) -> {
                             Path original = (Path) t;
-                            return original.resolveSibling(original.getFileName().toString().replaceFirst("\\.java$", ".joke"));
+                            return original.resolveSibling("Joke" + original.getFileName().toString());
                         })
                         .display(Display.dialog)
                         .displayType(DisplayType.code),
